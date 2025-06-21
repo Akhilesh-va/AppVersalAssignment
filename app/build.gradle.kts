@@ -73,5 +73,11 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+    //navigation
+    val nav_version = "2.9.0"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    // hilt navigation compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }
 

@@ -1,7 +1,7 @@
 package com.example.appversalassignment.data.api
 
-import com.example.appversalassignment.data.loginmodels.LoginRequest
-import com.example.appversalassignment.data.loginmodels.LoginResponse
+import com.example.appversalassignment.data.models.loginmodels.LoginRequest
+import com.example.appversalassignment.data.models.loginmodels.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
