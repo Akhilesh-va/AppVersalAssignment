@@ -1,19 +1,22 @@
 package com.example.appversalassignment.domain.repository
-
+// StoriesRepository.kt
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
-import android.widget.Toast
 import com.example.appversalassignment.data.api.ApiService
-import com.example.appversalassignment.data.models.loginmodels.LoginRequest
 import com.example.appversalassignment.data.models.loginmodels.trackusermodels.Campaign
+import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserRequest
 import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthenticationRepository @Inject constructor(private val apiService: ApiService ,@ApplicationContext private val context: Context) {
+@Singleton
+class StoriesRepository @Inject constructor(
+    private val apiService: ApiService,
+    @ApplicationContext private val context: Context
+) {
     private val sharedPrefs: SharedPreferences =
         context.getSharedPreferences("stories_prefs", Context.MODE_PRIVATE)
 
@@ -25,21 +28,25 @@ class AuthenticationRepository @Inject constructor(private val apiService: ApiSe
         return sharedPrefs.getString("access_token", null)
     }
 
-    suspend fun authenticate(loginRequest: LoginRequest ,context: Context) {
-
-
+    suspend fun authenticate(appId: String, accountId: String): Flow<Result<String>> = flow {
         try {
-            val response = apiService.validateAccount(loginRequest)
-            Log.d("AuthenticationRepository", "Token: ${response.access_token}")
-            saveAccessToken(response.access_token)
-
-            Toast.makeText(context, "Token saved!", Toast.LENGTH_SHORT).show()
-
+            val response = apiService.validateAccount(AuthRequest(appId, accountId))
+            if (response.isSuccessful) {
+                val token = response.body()?.access_token
+                if (token != null) {
+                    saveAccessToken(token)
+                    emit(Result.success(token))
+                } else {
+                    emit(Result.failure(Exception("Token is null")))
+                }
+            } else {
+                emit(Result.failure(Exception("Authentication failed: ${response.code()}")))
+            }
         } catch (e: Exception) {
-            Log.e("AuthenticationRepository", "Authentication failed", e)
-            Toast.makeText(context, "Login failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            emit(Result.failure(e))
         }
     }
+
     suspend fun getCampaigns(): Flow<Result<List<Campaign>>> = flow {
         try {
             val token = getAccessToken()
@@ -54,7 +61,7 @@ class AuthenticationRepository @Inject constructor(private val apiService: ApiSe
                 TrackScreenRequest("Home Screen")
             )
 
-            if (!screenResponse.) {
+            if (!screenResponse.isSuccessful) {
                 emit(Result.failure(Exception("Track screen failed: ${screenResponse.code()}")))
                 return@flow
             }
@@ -73,7 +80,7 @@ class AuthenticationRepository @Inject constructor(private val apiService: ApiSe
 
             if (userResponse.isSuccessful) {
                 val campaigns = userResponse.body()?.campaigns ?: emptyList()
-                emit(Result.success(campaigns))
+                emit(Result.success(campaigns) as Result<List<Campaign>>)
             } else {
                 emit(Result.failure(Exception("Track user failed: ${userResponse.code()}")))
             }
@@ -81,7 +88,4 @@ class AuthenticationRepository @Inject constructor(private val apiService: ApiSe
             emit(Result.failure(e))
         }
     }
-
-
-
 }
