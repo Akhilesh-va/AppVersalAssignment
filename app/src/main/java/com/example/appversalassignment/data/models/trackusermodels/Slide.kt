@@ -1,4 +1,4 @@
-package com.example.appversalassignment.data.models.loginmodels.trackusermodels
+package com.example.appversalassignment.data.models.trackusermodels
 
 data class Slide(
     val button_text: String? = null,

@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("home_screen/{campaignId}") { backStackEntry ->
                         val campaignId = backStackEntry.arguments?.getString("campaignId") ?: ""
-                        HomeScreen(campaignId = campaignId)
+                        HomeScreen(campaignViewmodel,navController)
                     }
                 }
 

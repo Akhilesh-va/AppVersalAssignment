@@ -1,4 +1,4 @@
-package com.example.appversalassignment.data.models.loginmodels.trackusermodels
+package com.example.appversalassignment.data.models.trackusermodels
 
 data class TrackUserResponse(
     val campaigns: List<Campaign?>? = null,

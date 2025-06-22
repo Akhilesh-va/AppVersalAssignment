@@ -13,38 +13,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.appversalassignment.viewmodel.CampaignViewmodel
-
 @Composable
-fun HomeScreen(
-    campaignId: String,
-    viewModel: CampaignViewmodel = hiltViewModel()
-) {
+fun HomeScreen(viewModel: CampaignViewmodel = hiltViewModel(), navController: NavController) {
     val uiState = viewModel.uiState
 
-    LaunchedEffect(campaignId) {
+    LaunchedEffect(Unit) {
         viewModel.getCampaigns()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-
-            uiState.error != null -> Text(
-                text = uiState.error ?: "Something went wrong",
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            else -> {
-                val campaign = uiState.campaigns.firstOrNull()
-                campaign?.let {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Campaign ID: ${it.id}", style = MaterialTheme.typography.titleMedium)
-                        Text("Type: ${it.campaign_type}")
-                        Text("Stories: ${it.details}")
-                    }
-                } ?: Text("No campaign data found", Modifier.align(Alignment.Center))
+    if (uiState.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else if (uiState.error != null) {
+        Text(
+            text = uiState.error ?: "Unknown error",
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(16.dp)
+        )
+    } else {
+        Column {
+            StoryGroupList(campaigns = uiState.campaigns) { detail ->
+                // Navigate to fullscreen story viewer
+                navController.navigate("story_viewer/${detail.id}")
             }
         }
     }

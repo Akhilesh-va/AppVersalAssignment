@@ -6,14 +6,11 @@ import android.util.Log
 import android.widget.Toast
 import com.example.appversalassignment.data.api.ApiService
 import com.example.appversalassignment.data.models.loginmodels.LoginRequest
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.Campaign
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserRequest
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserResponse
+import com.example.appversalassignment.data.models.trackusermodels.Campaign
+import com.example.appversalassignment.data.models.trackusermodels.TrackUserRequest
 import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenRequest
-import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import retrofit2.Response
 
 class CampaignRepository @Inject constructor(private val apiService: ApiService, @ApplicationContext private val context: Context) {
     private val sharedPrefs: SharedPreferences =

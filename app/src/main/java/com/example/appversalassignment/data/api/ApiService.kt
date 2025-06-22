@@ -2,8 +2,8 @@ package com.example.appversalassignment.data.api
 
 import com.example.appversalassignment.data.models.loginmodels.LoginRequest
 import com.example.appversalassignment.data.models.loginmodels.LoginResponse
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserRequest
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserResponse
+import com.example.appversalassignment.data.models.trackusermodels.TrackUserRequest
+import com.example.appversalassignment.data.models.trackusermodels.TrackUserResponse
 import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenRequest
 import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenResponse
 import retrofit2.Response

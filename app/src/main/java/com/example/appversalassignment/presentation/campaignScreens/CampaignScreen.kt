@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.appversalassignment.data.models.loginmodels.trackusermodels.Campaign
 import com.example.appversalassignment.viewmodel.CampaignViewmodel
 
 import androidx.navigation.NavController
