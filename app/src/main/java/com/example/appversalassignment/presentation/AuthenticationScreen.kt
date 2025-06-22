@@ -1,5 +1,6 @@
 package com.example.appversalassignment.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -7,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.appversalassignment.data.models.loginmodels.LoginRequest
 import com.example.appversalassignment.viewmodel.AuthViewmodel
 import com.example.appversalassignment.viewmodel.CampaignViewmodel
@@ -15,7 +17,9 @@ import com.example.appversalassignment.viewmodel.CampaignViewmodel
 @Composable
 fun AuthenticationScreen(
     authViewmodel: AuthViewmodel,
-    campaignViewmodel: CampaignViewmodel
+    campaignViewmodel: CampaignViewmodel,
+    onAuthenticated: () -> Unit
+
 ) {
     val context = LocalContext.current
     var appId by remember { mutableStateOf("") }
@@ -50,14 +54,16 @@ fun AuthenticationScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { authViewmodel.authenticateUser(LoginRequest("afadf960-3975-4ba2-933b-fac71ccc2002", "13555479-077f-445e-87f0-e6eae2e215c5"),context) },
+            onClick = { authViewmodel.authenticateUser(LoginRequest("afadf960-3975-4ba2-933b-fac71ccc2002", "13555479-077f-445e-87f0-e6eae2e215c5"),context)
+                 onAuthenticated()},
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Authenticate")
         }
 
         Button(
-            onClick = { campaignViewmodel.getCampaigns()},
+            onClick = { campaignViewmodel.getCampaigns()
+                     },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Campaigns")

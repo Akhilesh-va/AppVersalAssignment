@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewmodel @Inject constructor(private val repository: CampaignRepository) : ViewModel() {
-    fun authenticateUser(loginRequest: LoginRequest , context: Context){
+    fun authenticateUser(loginRequest: LoginRequest , context: Context ){
         viewModelScope.launch {
             try {
                 repository.authenticate(loginRequest,context)
@@ -25,20 +25,5 @@ class AuthViewmodel @Inject constructor(private val repository: CampaignReposito
 
 
     }
-    fun getCampaigns() {
-        viewModelScope.launch {
-            try {
-                val result = repository.getCampaigns()
-                if (result.isSuccess) {
-                    val campaigns = result.getOrNull()
-                    Log.e("Campaigns", "Received: $campaigns")
-                    // Handle the list of campaigns
-                } else {
-                    val exception = result.exceptionOrNull()
-                    // Handle the exception
-                }
-            } catch (e: Exception) {
-                Log.e("AuthViewModel", "Failed to get campaigns", e)
-            }
-        }}
+
 }

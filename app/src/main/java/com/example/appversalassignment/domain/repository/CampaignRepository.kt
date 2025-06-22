@@ -42,47 +42,59 @@ class CampaignRepository @Inject constructor(private val apiService: ApiService,
             Toast.makeText(context, "Login failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
         }
     }
-    suspend fun getCampaigns(): Result<List<Campaign>> {
-        try {
-            val sharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+
+    suspend fun getCampaignIdsFromTrackScreen(): Result<List<String>> {
+        return try {
             val token = getAccessToken()
-            Log.d("TokenCheck", "Token: $token")
+            if (token.isNullOrEmpty()) {
+                return Result.failure(Exception("No access token found"))
+            }
 
-
-            val screenResponse:Response<TrackScreenResponse> = apiService.trackScreen(
+            val response = apiService.trackScreen(
                 "Bearer $token",
-                TrackScreenRequest("Home Screen")
-
+                TrackScreenRequest(screen_name = "Home Screen")
             )
-            Log.d("TrackScreen", "isSuccessful: ${screenResponse.isSuccessful}")
-            Log.d("TrackScreen", "body: ${screenResponse.body()}")
-            Log.d("TrackScreen", "errorBody: ${screenResponse.errorBody()?.string()}")
 
+            if (response.isSuccessful) {
+                val rawIds = response.body()?.campaigns
+                val filteredIds = rawIds?.filterNotNull() ?: emptyList()
+                Log.d("TrackScreen", "Filtered Campaign IDs: $filteredIds")
 
-
-
-            val campaignIds = screenResponse.body()?.campaigns
-            Log.d("TrackScreen", "Campaign IDs: $campaignIds")
-
-
-
-            val userResponse: Response<TrackUserResponse> = apiService.trackUser(
-                "Bearer $token",
-                TrackUserRequest(campaign_list = campaignIds)
-            )
-            Log.d("TrackUser", "Response body: ${userResponse.body()}")
-            Log.d("TrackUser", "Raw: ${userResponse.code()} ${userResponse.message()}")
-
-
-            return if (userResponse.isSuccessful) {
-                val campaigns = userResponse.body()?.campaigns?.filterNotNull() ?: emptyList<Campaign>()
-                Log.e("screenResponse",campaigns.toString())
-                Result.success(campaigns)
+                Result.success(filteredIds)
             } else {
-                Result.failure(Exception("Track user failed: ${userResponse.code()}"))
+                val error = response.errorBody()?.string()
+                Log.e("TrackScreen", "Error: $error")
+                Result.failure(Exception("TrackScreen failed: ${response.code()}"))
             }
         } catch (e: Exception) {
-            return Result.failure(e)
+            Log.e("TrackScreen", "Exception", e)
+            Result.failure(e)
         }
     }
+
+
+    suspend fun getCampaignsByIds(ids: List<String>): Result<List<Campaign>> {
+        return try {
+            val token = getAccessToken()
+            if (token.isNullOrEmpty()) return Result.failure(Exception("No token found"))
+
+            val response = apiService.trackUser(
+                "Bearer $token",
+                TrackUserRequest(campaign_list = ids)
+            )
+
+            if (response.isSuccessful) {
+                val campaigns = response.body()?.campaigns?.filterNotNull() ?: emptyList()
+                Log.d("TrackUser", "Campaigns: $campaigns")
+                Result.success(campaigns)
+            } else {
+                val error = response.errorBody()?.string()
+                Log.e("TrackUser", "Failed: $error")
+                Result.failure(Exception("TrackUser failed: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }
