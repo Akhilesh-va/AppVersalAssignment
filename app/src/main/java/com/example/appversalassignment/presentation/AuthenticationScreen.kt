@@ -9,13 +9,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.appversalassignment.data.models.loginmodels.LoginRequest
 import com.example.appversalassignment.viewmodel.AuthViewmodel
-
-
+import com.example.appversalassignment.viewmodel.CampaignViewmodel
 
 
 @Composable
 fun AuthenticationScreen(
     authViewmodel: AuthViewmodel,
+    campaignViewmodel: CampaignViewmodel
 ) {
     val context = LocalContext.current
     var appId by remember { mutableStateOf("") }
@@ -54,6 +54,13 @@ fun AuthenticationScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Authenticate")
+        }
+
+        Button(
+            onClick = { campaignViewmodel.getCampaigns()},
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Campaigns")
         }
     }
 }

@@ -15,15 +15,15 @@ import retrofit2.http.POST
 interface ApiService {
     @POST("api/v1/users/validate-account/")
     suspend fun validateAccount(@Body request: LoginRequest): LoginResponse
-    @POST("users/track-screen/")
+    @POST("api/v1/users/track-screen/")
     suspend fun trackScreen(
         @Header("Authorization") token: String,
         @Body request: TrackScreenRequest
-    ): TrackScreenResponse
+    ): Response<TrackScreenResponse>
 
-    @POST("users/track-user/")
+    @POST("api/v1/users/track-user/")
     suspend fun trackUser(
         @Header("Authorization") token: String,
         @Body request: TrackUserRequest
-    ): TrackUserResponse
+    ): Response<TrackUserResponse>
 }

@@ -7,13 +7,15 @@ import android.widget.Toast
 import com.example.appversalassignment.data.api.ApiService
 import com.example.appversalassignment.data.models.loginmodels.LoginRequest
 import com.example.appversalassignment.data.models.loginmodels.trackusermodels.Campaign
+import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserRequest
+import com.example.appversalassignment.data.models.loginmodels.trackusermodels.TrackUserResponse
 import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenRequest
+import com.example.appversalassignment.data.models.trackscreenmodels.TrackScreenResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import retrofit2.Response
 
-class AuthenticationRepository @Inject constructor(private val apiService: ApiService ,@ApplicationContext private val context: Context) {
+class CampaignRepository @Inject constructor(private val apiService: ApiService, @ApplicationContext private val context: Context) {
     private val sharedPrefs: SharedPreferences =
         context.getSharedPreferences("stories_prefs", Context.MODE_PRIVATE)
 
@@ -40,48 +42,47 @@ class AuthenticationRepository @Inject constructor(private val apiService: ApiSe
             Toast.makeText(context, "Login failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
         }
     }
-    suspend fun getCampaigns(): Flow<Result<List<Campaign>>> = flow {
+    suspend fun getCampaigns(): Result<List<Campaign>> {
         try {
+            val sharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
             val token = getAccessToken()
-            if (token == null) {
-                emit(Result.failure(Exception("No access token found")))
-                return@flow
-            }
+            Log.d("TokenCheck", "Token: $token")
 
-            // Track Screen
-            val screenResponse = apiService.trackScreen(
+
+            val screenResponse:Response<TrackScreenResponse> = apiService.trackScreen(
                 "Bearer $token",
                 TrackScreenRequest("Home Screen")
-            )
 
-            if (!screenResponse.) {
-                emit(Result.failure(Exception("Track screen failed: ${screenResponse.code()}")))
-                return@flow
-            }
+            )
+            Log.d("TrackScreen", "isSuccessful: ${screenResponse.isSuccessful}")
+            Log.d("TrackScreen", "body: ${screenResponse.body()}")
+            Log.d("TrackScreen", "errorBody: ${screenResponse.errorBody()?.string()}")
+
+
+
 
             val campaignIds = screenResponse.body()?.campaigns
-            if (campaignIds.isNullOrEmpty()) {
-                emit(Result.failure(Exception("No campaigns found")))
-                return@flow
-            }
+            Log.d("TrackScreen", "Campaign IDs: $campaignIds")
 
-            // Track User
-            val userResponse = apiService.trackUser(
+
+
+            val userResponse: Response<TrackUserResponse> = apiService.trackUser(
                 "Bearer $token",
                 TrackUserRequest(campaign_list = campaignIds)
             )
+            Log.d("TrackUser", "Response body: ${userResponse.body()}")
+            Log.d("TrackUser", "Raw: ${userResponse.code()} ${userResponse.message()}")
 
-            if (userResponse.isSuccessful) {
-                val campaigns = userResponse.body()?.campaigns ?: emptyList()
-                emit(Result.success(campaigns))
+
+            return if (userResponse.isSuccessful) {
+                val campaigns = userResponse.body()?.campaigns?.filterNotNull() ?: emptyList<Campaign>()
+                Log.e("screenResponse",campaigns.toString())
+                Result.success(campaigns)
             } else {
-                emit(Result.failure(Exception("Track user failed: ${userResponse.code()}")))
+                Result.failure(Exception("Track user failed: ${userResponse.code()}"))
             }
         } catch (e: Exception) {
-            emit(Result.failure(e))
+            return Result.failure(e)
         }
     }
-
-
-
 }
