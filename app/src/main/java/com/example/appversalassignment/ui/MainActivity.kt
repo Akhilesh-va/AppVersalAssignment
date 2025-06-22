@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.appversalassignment.presentation.AuthenticationScreen
 import com.example.appversalassignment.presentation.HomeScreen.HomeScreen
+import com.example.appversalassignment.presentation.StoryViewerScreens.StoryViewerScreen
 import com.example.appversalassignment.presentation.campaignScreens.CampaignIdScreen
 
 import com.example.appversalassignment.ui.theme.AppVersalAssignmentTheme
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val authViewmodel : AuthViewmodel = hiltViewModel()
+            val authViewmodel: AuthViewmodel = hiltViewModel()
             AppVersalAssignmentTheme {
                 val navController = rememberNavController()
                 val authViewmodel: AuthViewmodel = hiltViewModel()
@@ -55,10 +56,19 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("home_screen/{campaignId}") { backStackEntry ->
                         val campaignId = backStackEntry.arguments?.getString("campaignId") ?: ""
-                        HomeScreen(campaignViewmodel,navController)
+                        HomeScreen(campaignViewmodel, navController)
                     }
-                }
+                    composable("story_viewer/{storyId}") { backStackEntry ->
+                        val storyId = backStackEntry.arguments?.getString("storyId") ?: ""
+                        StoryViewerScreen(
+                            storyId = storyId,
+                            viewModel = campaignViewmodel,
+                            onClose = { navController.popBackStack() }
+                        )
+                    }
 
+
+                }
             }
         }
     }
