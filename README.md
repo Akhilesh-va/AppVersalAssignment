@@ -38,4 +38,4 @@ A modern Android application built with Jetpack Compose, following clean archite
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/appversal-assignment.git
+   git clone https://github.com/Akhilesh-va/AppVersalAssignment/tree/CompletedAssignmnet
