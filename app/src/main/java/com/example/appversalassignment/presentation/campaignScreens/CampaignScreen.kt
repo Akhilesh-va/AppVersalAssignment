@@ -47,11 +47,11 @@ fun CampaignIdScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(uiState.campaignIds) { id ->
+                    items(uiState.campaignIds) { campaignId  ->
                         CampaignIdItem(
-                            campaignId = id,
+                            campaignId = campaignId ,
                             onClick = {
-                                navController.navigate("home_screen/$id")
+                                navController.navigate("home_screen/$campaignId ")
                             }
                         )
                     }
